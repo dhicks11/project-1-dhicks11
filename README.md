@@ -97,3 +97,18 @@ Modifying protected files will result in automatic academic integrity violation
 Implementation (70%): Function correctness, file operations, error handling
 
 Interview (30%): Code explanation and live coding challenge
+
+
+# Project 1: Character Creator & File Handling
+Name: Daylen Hicks  
+Date: 10/30/2025  
+
+## Description
+This program creates and manages character data, saving and loading information using Python file handling.  
+The project demonstrates function definitions, file I/O, and structured data management.
+
+## AI Usage
+AI assistance (ChatGPT) was used for:
+- Helping write file handling logic for saving and loading data  
+- Reviewing and documenting code comments for clarity  
+- Explaining how to correctly structure functions and connect program sections
