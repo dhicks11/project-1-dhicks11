@@ -1,11 +1,14 @@
 """
 COMP 163 - Project 1: Character Creator & Saving/Loading
-Name: [Your Name Here]
-Date: [Date]
+Name: [Daylen Hicks]
+Date: [10/28/2025]
 
 AI Usage: [Document any AI assistance used]
 Example: AI helped with file I/O error handling logic in save_character function
 """
+
+import random
+import os
 
 def create_character(name, character_class):
     """
@@ -18,7 +21,21 @@ def create_character(name, character_class):
     """
     # TODO: Implement this function
     # Remember to use calculate_stats() function for stat calculation
-    pass
+    level = 1
+    
+    strength, magic, health = calculate_stats(character_class, level)
+
+    character = {
+        "name": name,
+        "class": character_class,
+        "level": level,
+        "strength": strength,
+        "magic": magic,
+        "health": health,
+        "gold": 200
+    }
+    
+    return character
 
 def calculate_stats(character_class, level):
     """
@@ -31,9 +48,36 @@ def calculate_stats(character_class, level):
     - Rogues: Medium strength, medium magic, low health
     - Clerics: Medium strength, high magic, high health
     """
-    # TODO: Implement this function
-    # Return a tuple: (strength, magic, health)
-    pass
+# TODO: Implement this function
+    if character_class == "Warrior":
+        base_str, base_mag, base_hp = 10, 3, 150
+        growth_str, growth_mag, growth_hp = 3, 1, 20
+    elif character_class == "Mage":
+        base_str, base_mag, base_hp = 5, 12, 90
+        growth_str, growth_mag, growth_hp = 1, 4, 10
+    elif character_class == "Rogue":
+        base_str, base_mag, base_hp = 7, 7, 80
+        growth_str, growth_mag, growth_hp = 2, 2, 8
+    elif character_class == "Cleric":
+        base_str, base_mag, base_hp = 6, 10, 120
+        growth_str, growth_mag, growth_hp = 2, 3, 15
+    else:
+        base_str, base_mag, base_hp = 5, 5, 70
+        growth_str, growth_mag, growth_hp = 1, 1, 5
+
+    # Calculate stats for current level
+    strength = base_str + (level - 1) * growth_str
+    magic    = base_mag + (level - 1) * growth_mag
+    health   = base_hp  + (level - 1) * growth_hp
+
+    # Add small random bonus only if level > 1
+    if level > 1:
+        strength += random.randint(0, 3)
+        magic += random.randint(0, 3)
+        health += random.randint(0, 5)
+
+    return (strength, magic, health)
+
 
 def save_character(character, filename):
     """
@@ -49,9 +93,24 @@ def save_character(character, filename):
     Health: [health]
     Gold: [gold]
     """
+
     # TODO: Implement this function
     # Remember to handle file errors gracefully
-    pass
+    directory = os.path.dirname(filename)
+    if directory and not os.path.exists(directory):
+        # Directory does not exist
+        return False
+    
+    f = open(filename, "w")
+    f.write(f"Character Name: {character['name']}\n")
+    f.write(f"Class: {character['class']}\n")
+    f.write(f"Level: {character['level']}\n")
+    f.write(f"Strength: {character['strength']}\n")
+    f.write(f"Magic: {character['magic']}\n")
+    f.write(f"Health: {character['health']}\n")
+    f.write(f"Gold: {character['gold']}\n")
+    f.close()
+    return True
 
 def load_character(filename):
     """
@@ -60,7 +119,32 @@ def load_character(filename):
     """
     # TODO: Implement this function
     # Remember to handle file not found errors
-    pass
+    if not os.path.exists(filename):
+        return None
+    f  = open(filename, "r")
+    lines = f.readlines()
+    
+    character_data = {}
+    for line in lines:
+        key, value = line.strip().split(": ")
+        if key == "Character Name":
+            character_data["name"] = value
+        elif key == "Class":
+            character_data["class"] = value
+        elif key == "Level":
+            character_data["level"] = int(value)
+        elif key == "Strength":
+            character_data["strength"] = int(value)
+        elif key == "Magic":
+            character_data["magic"] = int(value)
+        elif key == "Health":
+            character_data["health"] = int(value)
+        elif key == "Gold":
+            character_data["gold"] = int(value)
+    f.close()
+    return character_data
+
+
 
 def display_character(character):
     """
@@ -78,7 +162,14 @@ def display_character(character):
     Gold: 100
     """
     # TODO: Implement this function
-    pass
+    print("\n=== CHARACTER SHEET ===")
+    print(f"Name: {character['name']}")
+    print(f"Class: {character['class']}")
+    print(f"Level: {character['level']}")
+    print(f"Strength: {character['strength']}")
+    print(f"Magic: {character['magic']}")
+    print(f"Health: {character['health']}")
+    print(f"Gold: {character['gold']}")
 
 def level_up(character):
     """
@@ -88,13 +179,37 @@ def level_up(character):
     """
     # TODO: Implement this function
     # Remember to recalculate stats for the new level
-    pass
+    character["level"] += 1
+    # Recalculate stats using calculate_stats()
+    strength, magic, health = calculate_stats(character["class"], character["level"])
+    character["strength"] = strength
+    character["magic"] = magic
+    character["health"] = health
+    character["gold"] += 50
+    print(f"\n🎉 {character['name']} leveled up to Level {character['level']}!")
 
 # Main program area (optional - for testing your functions)
 if __name__ == "__main__":
     print("=== CHARACTER CREATOR ===")
     print("Test your functions here!")
-    
+
+    name = input("Enter your character's name: ")
+    cclass = input("Choose class (Warrior/Mage/Rogue/Cleric): ")
+
+    hero = create_character(name, cclass)
+    display_character(hero)
+
+    save_character(hero, f"{hero['name'].lower()}.txt")
+    print("\nCharacter saved successfully!")
+
+    level_up(hero)
+    display_character(hero)
+
+    # Load character example
+    loaded_hero = load_character(f"{hero['name'].lower()}.txt")
+    if loaded_hero:
+        print("\nCharacter loaded from file:")
+        display_character(loaded_hero)
     # Example usage:
     # char = create_character("TestHero", "Warrior")
     # display_character(char)
